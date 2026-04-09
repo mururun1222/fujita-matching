@@ -10,6 +10,7 @@
   --bd1:rgba(0,0,0,0.10);--bd2:rgba(0,0,0,0.22);
   --accent:#534AB7;--accent-bg:#EEEDFE;--accent-text:#3C3489;
   --accent2:#1D7A5F;--accent2-bg:#E3F5F0;--accent2-text:#155C47;
+  --warn:#B45309;--warn-bg:#FEF3C7;
   --danger:#c0392b;--danger-bg:#fdf0ef;
 }
 @media(prefers-color-scheme:dark){:root{
@@ -17,10 +18,17 @@
   --bd1:rgba(255,255,255,0.10);--bd2:rgba(255,255,255,0.22);
   --accent-bg:#3C3489;--accent-text:#CECBF6;
   --accent2-bg:#1A4A3A;--accent2-text:#7ECFB8;
-  --danger-bg:#3a1a18;
+  --warn-bg:#3a2a00;--danger-bg:#3a1a18;
 }}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;font-size:15px}
+
+/* ローディング */
+#loading{position:fixed;inset:0;background:rgba(255,255,255,.85);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:800}
+@media(prefers-color-scheme:dark){#loading{background:rgba(0,0,0,.75)}}
+.spinner{width:36px;height:36px;border:3px solid var(--bd2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-msg{font-size:14px;color:var(--t2)}
 
 /* ロック */
 #lock-screen{position:fixed;inset:0;background:var(--bg1);display:flex;align-items:center;justify-content:center;z-index:999;padding:2rem}
@@ -30,20 +38,17 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .lock-sub{font-size:13px;color:var(--t2);margin-bottom:1.75rem;line-height:1.65}
 .lock-input{width:100%;padding:13px 16px;border:1px solid var(--bd2);border-radius:10px;font-size:15px;background:var(--bg1);color:var(--t1);outline:none;text-align:center;letter-spacing:.1em;margin-bottom:10px;-webkit-appearance:none;transition:border .15s}
 .lock-input:focus{border-color:var(--accent)}
-.lock-btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
-.lock-btn:hover{opacity:.88}
+.lock-btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
 .lock-err{font-size:13px;color:var(--danger);margin-top:8px;min-height:18px}
 
 /* メイン */
 #main{display:none}
 #app{max-width:580px;margin:0 auto;padding:1.5rem 1rem 5rem}
 .tabs{display:flex;gap:4px;margin-bottom:1.5rem;background:var(--bg2);border-radius:10px;padding:4px}
-.tab{flex:1;padding:8px;border:none;border-radius:7px;background:transparent;color:var(--t2);font-size:13px;cursor:pointer;transition:all .15s;font-weight:500;white-space:nowrap}
+.tab{flex:1;padding:8px;border:none;border-radius:7px;background:transparent;color:var(--t2);font-size:13px;cursor:pointer;transition:all .15s;font-weight:500}
 .tab.active{background:var(--bg1);color:var(--t1);box-shadow:0 1px 4px rgba(0,0,0,.12)}
 .hd{font-size:20px;font-weight:600;margin-bottom:4px}
 .sub{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:1.25rem}
-
-/* タグ */
 .tag-group{margin-bottom:1.25rem}
 .tag-group-label{font-size:11px;font-weight:600;letter-spacing:.07em;color:var(--t3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .tag-group-label::after{content:"";flex:1;height:1px;background:var(--bd1)}
@@ -55,8 +60,6 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .divider{height:1px;background:var(--bd1);margin:0 0 1.25rem}
 .results-label{font-size:12px;color:var(--t3);letter-spacing:.04em;margin-bottom:12px}
 .empty{font-size:14px;color:var(--t2);line-height:1.7}
-
-/* メンバーカード */
 .member-card{background:var(--bg1);border:1px solid var(--bd1);border-radius:12px;padding:14px 16px;margin-bottom:10px}
 .mc-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .mc-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0}
@@ -69,13 +72,12 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .mc-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .mc-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 12px;border-radius:100px;border:1px solid var(--bd2);color:var(--accent-text);background:var(--accent-bg);text-decoration:none;transition:opacity .15s}
 .mc-link:hover{opacity:.75}
-.mc-contact{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 12px;border-radius:100px;border:1px solid var(--bd2);color:var(--t2);background:var(--bg2);cursor:pointer;transition:opacity .15s}
-.mc-contact:hover{opacity:.75}
+.mc-contact{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 12px;border-radius:100px;border:1px solid var(--bd2);color:var(--t2);background:var(--bg2);cursor:pointer}
 .bar-wrap{height:3px;background:var(--bd1);border-radius:2px;margin-top:6px;overflow:hidden}
 .bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
 .reset-btn{display:inline-block;margin-top:8px;padding:8px 16px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--t2);font-size:13px;cursor:pointer}
 
-/* メンバー登録フォーム */
+/* 登録フォーム */
 .register-box{background:var(--bg2);border-radius:14px;padding:20px}
 .register-title{font-size:16px;font-weight:600;margin-bottom:4px}
 .register-sub{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px}
@@ -85,23 +87,35 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .field input:focus,.field textarea:focus{border-color:var(--accent)}
 .field textarea{resize:vertical;min-height:72px;line-height:1.5}
 .field .hint{font-size:11px;color:var(--t3);margin-top:4px}
-.checkbox-group-label{font-size:12px;font-weight:600;color:var(--t2);margin:12px 0 7px}
+.cb-group-label{font-size:12px;font-weight:600;color:var(--t2);margin:12px 0 7px}
 .checkbox-grid{display:flex;flex-wrap:wrap;gap:7px}
 .cb-label{display:flex;align-items:center;gap:6px;padding:7px 13px;border:1px solid var(--bd2);border-radius:100px;font-size:13px;cursor:pointer;transition:all .15s;user-select:none;background:var(--bg1)}
 .cb-label.interest:has(input:checked){border-color:var(--accent);background:var(--accent-bg);color:var(--accent-text)}
 .cb-label.society:has(input:checked){border-color:var(--accent2);background:var(--accent2-bg);color:var(--accent2-text)}
 .cb-label input{display:none}
-.submit-btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;transition:opacity .15s}
-.submit-btn:hover{opacity:.88}
+.submit-btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
 .success-box{text-align:center;padding:2rem 1rem}
 .success-icon{font-size:48px;margin-bottom:12px}
 .success-title{font-size:18px;font-weight:600;margin-bottom:8px}
 .success-sub{font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:20px}
 .back-btn{padding:10px 24px;border:1px solid var(--bd2);border-radius:9px;background:transparent;color:var(--t1);font-size:14px;cursor:pointer}
 
-/* FAB & モーダル（管理） */
+/* 承認待ちバナー */
+.pending-banner{background:var(--warn-bg);border:1px solid rgba(180,83,9,.25);border-radius:10px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px}
+.pending-banner-icon{font-size:18px;flex-shrink:0}
+.pending-banner-info{flex:1;min-width:0}
+.pending-name{font-size:14px;font-weight:500;margin-bottom:2px}
+.pending-detail{font-size:12px;color:var(--t2);margin-bottom:6px;line-height:1.4}
+.pending-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.pending-tag-i{font-size:11px;padding:2px 8px;border-radius:100px;background:var(--accent-bg);color:var(--accent-text)}
+.pending-tag-s{font-size:11px;padding:2px 8px;border-radius:100px;background:var(--accent2-bg);color:var(--accent2-text)}
+.pending-btns{display:flex;gap:8px}
+.approve-btn{padding:6px 14px;border:none;border-radius:7px;background:var(--accent2);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.reject-btn{padding:6px 14px;border:1px solid var(--bd2);border-radius:7px;background:transparent;color:var(--t2);font-size:13px;cursor:pointer}
+
+/* FAB & モーダル */
 .fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;font-size:26px;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(83,74,183,.45);display:flex;align-items:center;justify-content:center;transition:transform .15s;z-index:100}
-.fab:hover{transform:scale(1.08)}.fab:active{transform:scale(.95)}
+.fab:active{transform:scale(.95)}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .modal-overlay.open{opacity:1;pointer-events:all}
 .modal{background:var(--bg1);border-radius:20px 20px 0 0;width:100%;max-width:580px;max-height:90dvh;overflow-y:auto;padding:0 0 2rem;transform:translateY(40px);transition:transform .25s cubic-bezier(.22,1,.36,1)}
@@ -111,9 +125,8 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--bg2);color:var(--t2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .modal-body{padding:16px 20px 0}
 .modal-footer{padding:16px 20px 0;display:flex;gap:10px}
-.btn-cancel{flex:1;padding:12px;border:1px solid var(--bd2);border-radius:10px;background:transparent;color:var(--t2);font-size:14px;font-weight:500;cursor:pointer}
-.btn-save{flex:2;padding:12px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s}
-.btn-save:hover{opacity:.88}
+.btn-cancel{flex:1;padding:12px;border:1px solid var(--bd2);border-radius:10px;background:transparent;color:var(--t2);font-size:14px;cursor:pointer}
+.btn-save{flex:2;padding:12px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer}
 
 /* 管理タブ */
 .section-title{font-size:13px;font-weight:600;color:var(--t2);letter-spacing:.05em;margin-bottom:10px;margin-top:1.5rem}
@@ -124,9 +137,8 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .tag-add-row{display:flex;gap:6px;margin-top:4px;margin-bottom:12px}
 .tag-add-row input{flex:1;padding:8px 12px;border:1px solid var(--bd2);border-radius:8px;background:var(--bg1);color:var(--t1);font-size:13px;outline:none}
 .tag-add-row input:focus{border-color:var(--accent)}
-.tag-add-row .btn-i{padding:8px 14px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
-.tag-add-row .btn-s{padding:8px 14px;border:none;border-radius:8px;background:var(--accent2);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
-.member-list-edit{margin-top:4px}
+.tag-add-row .bi{padding:8px 14px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.tag-add-row .bs{padding:8px 14px;border:none;border-radius:8px;background:var(--accent2);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
 .me-row{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border:1px solid var(--bd1);border-radius:10px;margin-bottom:7px}
 .me-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0;margin-top:1px}
 .me-info{flex:1;min-width:0}
@@ -136,25 +148,17 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .me-tag-s{font-size:11px;padding:2px 8px;border-radius:100px;background:var(--accent2-bg);color:var(--accent2-text)}
 .me-meta{font-size:11px;color:var(--t3)}
 .me-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
-.icon-btn{width:28px;height:28px;border:1px solid var(--bd2);border-radius:7px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:14px;transition:all .15s}
+.icon-btn{width:28px;height:28px;border:1px solid var(--bd2);border-radius:7px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:13px}
 .icon-btn:hover{background:var(--bg2)}.icon-btn.del:hover{background:var(--danger-bg);color:var(--danger);border-color:var(--danger)}
-
-/* パスワード設定 */
-.code-box{background:var(--bg2);border-radius:10px;padding:14px 16px;margin-bottom:8px}
-.code-row{display:flex;align-items:center;gap:8px}
-.code-row input{flex:1;padding:9px 12px;border:1px solid var(--bd2);border-radius:8px;background:var(--bg1);color:var(--t1);font-size:14px;font-family:monospace;outline:none}
-.code-row input:focus{border-color:var(--accent)}
-.code-row button{padding:9px 14px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
-.code-hint{font-size:12px;color:var(--t3);margin-top:8px;line-height:1.6}
-
-/* 保存 */
-.save-btn-wrap{margin-top:1rem}
-.save-btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent2);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
-.save-btn:hover{opacity:.88}
-.export-area textarea{width:100%;height:160px;padding:10px;border:1px solid var(--bd2);border-radius:8px;background:var(--bg2);color:var(--t1);font-size:12px;font-family:monospace;resize:vertical;outline:none;margin-top:6px}
-.export-btns{display:flex;gap:8px;margin-top:8px}
-.export-btns button{flex:1;padding:9px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--t1);font-size:13px;font-weight:500;cursor:pointer}
-.export-btns button:hover{background:var(--bg2)}
+.settings-box{background:var(--bg2);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.settings-row{display:flex;gap:8px;margin-bottom:8px}
+.settings-row:last-child{margin-bottom:0}
+.settings-row input{flex:1;padding:9px 12px;border:1px solid var(--bd2);border-radius:8px;background:var(--bg1);color:var(--t1);font-size:13px;font-family:monospace;outline:none}
+.settings-row input:focus{border-color:var(--accent)}
+.settings-row button{padding:9px 14px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.settings-hint{font-size:11px;color:var(--t3);margin-top:6px;line-height:1.6}
+.dl-btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent2);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+.reload-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--bd2);border-radius:8px;background:transparent;color:var(--t2);font-size:13px;cursor:pointer;margin-left:auto}
 
 .toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:100px;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;z-index:9999;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -162,12 +166,14 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 </head>
 <body>
 
-<!-- ロック画面 -->
+<div id="loading"><div class="spinner"></div><div class="loading-msg" id="loading-msg">読み込み中…</div></div>
+
+<!-- ロック -->
 <div id="lock-screen">
   <div class="lock-box">
     <div class="lock-icon">🏥</div>
     <div class="lock-title">藤田総診 つながりマッチング</div>
-    <div class="lock-sub">メンバー限定のページです。<br>パスワードを入力してください。</div>
+    <div class="lock-sub">メンバー限定ページです。<br>パスワードを入力してください。</div>
     <input class="lock-input" id="lock-input" type="password" placeholder="パスワード" autocomplete="off">
     <button class="lock-btn" onclick="tryUnlock()">入る</button>
     <div class="lock-err" id="lock-err"></div>
@@ -183,28 +189,22 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
     <button class="tab" onclick="switchTab('admin',this)">⚙️ 管理</button>
   </div>
 
-  <!-- 検索タブ -->
+  <!-- 検索 -->
   <div id="tab-search">
     <div class="hd">藤田総診 つながりマッチング</div>
     <div class="sub">気になるキーワードをタップ。選んだ分野に近いメンバーが表示されます。</div>
-    <div class="tag-group">
-      <div class="tag-group-label">💡 興味・関心</div>
-      <div class="tag-grid" id="tags-interest"></div>
-    </div>
-    <div class="tag-group">
-      <div class="tag-group-label">🏛️ 関わっている学会</div>
-      <div class="tag-grid" id="tags-society"></div>
-    </div>
+    <div class="tag-group"><div class="tag-group-label">💡 興味・関心</div><div class="tag-grid" id="tags-interest"></div></div>
+    <div class="tag-group"><div class="tag-group-label">🏛️ 関わっている学会</div><div class="tag-grid" id="tags-society"></div></div>
     <div class="divider"></div>
     <div id="results"></div>
   </div>
 
-  <!-- 登録タブ -->
+  <!-- 登録 -->
   <div id="tab-register" style="display:none">
     <div id="register-form-wrap">
       <div class="register-box">
         <div class="register-title">✋ メンバー登録</div>
-        <div class="register-sub">あなたの情報を登録して、つながりを広げましょう。<br>入力後「登録する」を押してください。</div>
+        <div class="register-sub">あなたの情報を登録しましょう。<br>管理者が承認後、一覧に表示されます。</div>
         <div class="field"><label>名前 *</label><input id="r-name" type="text" placeholder="例：田中"></div>
         <div class="field"><label>一言コメント</label><textarea id="r-detail" placeholder="例：総合診療 × 産業保健。予防医療に関心があります。"></textarea></div>
         <div class="field">
@@ -214,10 +214,10 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
         </div>
         <div class="field"><label>連絡先（メール・LINE WORKSなど）</label><input id="r-contact" type="text" placeholder="例：tanaka@example.com"></div>
         <div class="field">
-          <label>タグを選択してください（複数可）</label>
-          <div class="checkbox-group-label">💡 興味・関心</div>
+          <label>タグを選択（複数可）</label>
+          <div class="cb-group-label">💡 興味・関心</div>
           <div class="checkbox-grid" id="r-tags-interest"></div>
-          <div class="checkbox-group-label">🏛️ 関わっている学会</div>
+          <div class="cb-group-label">🏛️ 関わっている学会</div>
           <div class="checkbox-grid" id="r-tags-society"></div>
         </div>
         <button class="submit-btn" onclick="submitRegister()">登録する</button>
@@ -226,80 +226,77 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
     <div id="register-success" style="display:none">
       <div class="success-box">
         <div class="success-icon">🎉</div>
-        <div class="success-title">登録が完了しました！</div>
-        <div class="success-sub">メンバー一覧に追加されました。<br>検索タブから確認できます。</div>
+        <div class="success-title">登録申請を送りました！</div>
+        <div class="success-sub">管理者が承認後、<br>メンバー一覧に表示されます。</div>
         <button class="back-btn" onclick="backToSearch()">検索画面に戻る</button>
       </div>
     </div>
   </div>
 
-  <!-- 管理タブ -->
+  <!-- 管理 -->
   <div id="tab-admin" style="display:none">
+
+    <div class="section-title" style="margin-top:0;display:flex;align-items:center">
+      ⏳ 承認待ちメンバー
+      <button class="reload-btn" onclick="loadAdminData()">🔄 再読み込み</button>
+    </div>
+    <div id="pending-list"><div class="empty">承認待ちはいません。</div></div>
+
+    <div class="section-title">👥 承認済みメンバー</div>
+    <div id="member-list-edit"></div>
+
     <div class="section-title">🏷️ タグ管理</div>
     <div class="tag-section-hd">💡 興味・関心タグ</div>
     <div id="tag-manage-interest"></div>
     <div class="tag-add-row">
       <input id="new-tag-interest" type="text" placeholder="興味・関心タグを追加…">
-      <button class="btn-i" onclick="addTag('interest')">追加</button>
+      <button class="bi" onclick="addTag('interest')">追加</button>
     </div>
     <div class="tag-section-hd">🏛️ 学会タグ</div>
     <div id="tag-manage-society"></div>
     <div class="tag-add-row">
       <input id="new-tag-society" type="text" placeholder="学会名を追加…">
-      <button class="btn-s" onclick="addTag('society')">追加</button>
+      <button class="bs" onclick="addTag('society')">追加</button>
     </div>
 
-    <div class="section-title" style="margin-top:2rem">👥 登録済みメンバー</div>
-    <div id="member-list-edit" class="member-list-edit"></div>
-
-    <div class="section-title" style="margin-top:2rem">🔑 パスワード変更</div>
-    <div class="code-box">
-      <div class="code-row">
-        <input id="code-input" type="text" placeholder="新しいパスワードを入力">
-        <button onclick="saveCode()">変更</button>
+    <div class="section-title">⚙️ API設定</div>
+    <div class="settings-box">
+      <div class="settings-row">
+        <input id="s-url" type="text" placeholder="Apps Script Web App URL">
+        <button onclick="saveSettings()">保存</button>
       </div>
-      <div class="code-hint">現在のパスワード：<strong id="current-code-display"></strong></div>
+      <div class="settings-row">
+        <input id="s-adminkey" type="text" placeholder="管理者キー（ADMIN_KEY）">
+      </div>
+      <div class="settings-row">
+        <input id="s-password" type="text" placeholder="ページパスワード（ACCESS_CODE）">
+      </div>
+      <div class="settings-hint" id="settings-hint"></div>
     </div>
 
-    <div class="section-title" style="margin-top:2rem">💾 HTMLとして保存</div>
-    <div class="save-btn-wrap">
-      <button class="save-btn" onclick="downloadHtml()">⬇️ 最新データを含むHTMLをダウンロード</button>
-    </div>
-    <div style="margin-top:1.5rem" class="export-area">
-      <label style="font-size:12px;color:var(--t2)">JSONデータ</label>
-      <textarea id="export-box" readonly></textarea>
-      <div class="export-btns">
-        <button onclick="copyExport()">📋 コピー</button>
-        <button onclick="importData()">📥 JSONを読み込む</button>
-      </div>
-    </div>
+    <div class="section-title">💾 HTMLとして保存</div>
+    <button class="dl-btn" onclick="downloadHtml()">⬇️ 最新設定を含むHTMLをダウンロード</button>
   </div>
 </div>
 
-<!-- 管理用 編集モーダル -->
-<button class="fab" id="fab" onclick="openModal()" title="メンバーを追加">＋</button>
+<!-- 管理用モーダル -->
+<button class="fab" id="fab" onclick="openModal()" style="display:none">＋</button>
 <div class="modal-overlay" id="modal-overlay" onclick="overlayClick(event)">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title" id="modal-title">メンバーを追加</span>
+      <span class="modal-title" id="modal-title">メンバーを編集</span>
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
     <div class="modal-body">
-      <input type="hidden" id="f-edit-idx" value="-1">
-      <div class="field"><label>名前 *</label><input id="f-name" type="text" placeholder="例：田中"></div>
-      <div class="field"><label>一言コメント</label><textarea id="f-detail" placeholder="例：総合診療 × 産業保健。予防医療に関心。"></textarea></div>
-      <div class="field">
-        <label>URL</label>
-        <input id="f-url" type="url" placeholder="https://...">
-        <div class="hint">カンマ区切りで複数入力可</div>
-      </div>
-      <div class="field"><label>連絡先</label><input id="f-contact" type="text" placeholder="例：tanaka@example.com"></div>
+      <input type="hidden" id="f-orig-name">
+      <div class="field"><label>名前 *</label><input id="f-name" type="text"></div>
+      <div class="field"><label>一言コメント</label><textarea id="f-detail"></textarea></div>
+      <div class="field"><label>URL</label><input id="f-url" type="url" placeholder="https://..."><div class="hint">カンマ区切りで複数可</div></div>
+      <div class="field"><label>連絡先</label><input id="f-contact" type="text"></div>
       <div class="field">
         <label>タグ</label>
-        <div class="checkbox-group-label">💡 興味・関心</div>
-        <div class="checkbox-grid" id="f-tags-interest"></div>
-        <div class="checkbox-group-label">🏛️ 学会</div>
-        <div class="checkbox-grid" id="f-tags-society"></div>
+        <div class="cb-group-label">💡 興味・関心</div><div class="checkbox-grid" id="f-tags-interest"></div>
+        <div class="cb-group-label">🏛️ 学会</div><div class="checkbox-grid" id="f-tags-society"></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -313,14 +310,24 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 <div class="toast" id="toast"></div>
 
 <script>
-// ===== パスワード =====
-let ACCESS_CODE = "fujita2024"; // ← ここを変更するか、管理タブから変更
+// ===== 設定（ここを書き換えるか、管理タブのAPI設定から入力） =====
+let SCRIPT_URL  = "";           // ← Apps Script Web App URL
+let ADMIN_KEY   = "admin_fujita2024"; // ← Apps Scriptと同じ値
+let ACCESS_CODE = "fujita2024"; // ← ページパスワード
 
+// ===== 状態 =====
+let interestTags=[], societyTags=[], members=[], pendingMembers=[];
+let selectedInterest=new Set(), selectedSociety=new Set();
+const COLORS=["#534AB7","#1D9E75","#D4537E","#378ADD","#0F6E56","#BA7517","#D85A30","#993C1D","#639922","#185FA5","#993556","#7B4DA8","#2C8C6B"];
+function colorFor(n){let h=0;for(let c of n)h=(h*31+c.charCodeAt(0))%COLORS.length;return COLORS[h]}
+
+// ===== パスワード =====
 function tryUnlock(){
   const v=document.getElementById("lock-input").value.trim();
   if(v===ACCESS_CODE){
     document.getElementById("lock-screen").style.display="none";
     document.getElementById("main").style.display="block";
+    loadData();
   } else {
     document.getElementById("lock-err").textContent="パスワードが正しくありません。";
     document.getElementById("lock-input").value="";
@@ -328,35 +335,53 @@ function tryUnlock(){
 }
 document.getElementById("lock-input").addEventListener("keydown",e=>{if(e.key==="Enter")tryUnlock()});
 
-function saveCode(){
-  const v=document.getElementById("code-input").value.trim();
-  if(!v){toast("パスワードを入力してください");return}
-  ACCESS_CODE=v;
-  document.getElementById("code-input").value="";
-  document.getElementById("current-code-display").textContent=ACCESS_CODE;
-  toast("パスワードを変更しました。HTMLを保存して再配布してください")
+// ===== API =====
+function showLoading(v,msg="処理中…"){
+  const el=document.getElementById("loading");
+  el.style.display=v?"flex":"none";
+  document.getElementById("loading-msg").textContent=msg;
+}
+async function apiFetch(params, method="GET"){
+  if(!SCRIPT_URL){toast("⚠️ API設定でURLを入力してください");return null}
+  try{
+    let res;
+    if(method==="GET"){
+      const q=new URLSearchParams(params).toString();
+      res=await fetch(SCRIPT_URL+(q?"?"+q:""),{redirect:"follow"});
+    }else{
+      res=await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(params),redirect:"follow"});
+    }
+    return await res.json();
+  }catch(e){toast("通信エラー："+e.message);return null}
 }
 
-// ===== データ =====
-const COLORS=["#534AB7","#1D9E75","#D4537E","#378ADD","#0F6E56","#BA7517","#D85A30","#993C1D","#639922","#185FA5","#993556","#7B4DA8","#2C8C6B"];
-function colorFor(n){let h=0;for(let c of n)h=(h*31+c.charCodeAt(0))%COLORS.length;return COLORS[h]}
-
-let interestTags=["こころの医療","子どもの発達・思春期","女性の健康・周産期","母子保健","離島・へき地医療","産業保健・働く人の健康","健康経営・予防医療","起業・ビジネス","テクノロジー × 医療","公衆衛生・MPH","災害医療・国際保健","留学・海外経験","アート × 医療"];
-let societyTags=["日本プライマリ・ケア連合学会","日本内科学会","日本総合診療医学会","日本病院総合診療医学会","日本老年医学会","日本緩和医療学会","日本救急医学会","日本在宅医学会","日本医療情報学会"];
-let members=[
-  {name:"中込",interestTags:["起業・ビジネス","産業保健・働く人の健康","健康経営・予防医療","テクノロジー × 医療"],societyTags:[],detail:"総合診療 × アントレプレナーシップ。産業保健・予防医療・テクノロジーを掛け合わせたキャリアを実践中。",url:"",contact:""},
-  {name:"石川",interestTags:["起業・ビジネス","子どもの発達・思春期","こころの医療"],societyTags:[],detail:"アントレプレナーシップと児童精神を両軸に。発達障害の二次障害に特に関心。",url:"",contact:""},
-  {name:"石原",interestTags:["こころの医療","子どもの発達・思春期","女性の健康・周産期","母子保健"],societyTags:[],detail:"精神科・心療内科領域を軸に、婦人科・母子保健まで幅広くカバー。",url:"",contact:""},
-  {name:"黒田",interestTags:["こころの医療"],societyTags:[],detail:"心療内科・精神科連携に取り組む。",url:"",contact:""},
-  {name:"森",interestTags:["こころの医療"],societyTags:[],detail:"心療内科・精神科連携に取り組む。",url:"",contact:""},
-  {name:"山本",interestTags:["産業保健・働く人の健康"],societyTags:[],detail:"産業保健の実践者。",url:"",contact:""},
-  {name:"根本",interestTags:["離島・へき地医療"],societyTags:[],detail:"離島診療の現場経験を持つ。",url:"",contact:""},
-  {name:"吉澤",interestTags:["離島・へき地医療"],societyTags:[],detail:"離島診療の現場経験を持つ。",url:"",contact:""},
-  {name:"青山幸",interestTags:["母子保健","離島・へき地医療"],societyTags:[],detail:"母子保健と離島医療を掛け合わせた実践。",url:"",contact:""},
-  {name:"道川",interestTags:["公衆衛生・MPH","災害医療・国際保健"],societyTags:[],detail:"MPHホルダー。災害医療にも精通。",url:"",contact:""},
-  {name:"本多",interestTags:["公衆衛生・MPH","留学・海外経験","アート × 医療"],societyTags:[],detail:"MPH・留学経験あり。アート × 医療という独自の視点を持つ。",url:"",contact:""}
-];
-let selectedInterest=new Set(),selectedSociety=new Set();
+// ===== データ読み込み =====
+async function loadData(){
+  if(!SCRIPT_URL){renderSearch();return}
+  showLoading(true,"メンバー情報を読み込み中…");
+  const d=await apiFetch({});
+  if(d&&d.ok){
+    interestTags=d.interestTags||[];
+    societyTags=d.societyTags||[];
+    members=d.members||[];
+  }
+  renderSearch();
+  showLoading(false);
+}
+async function loadAdminData(){
+  if(!SCRIPT_URL){renderAdminTab();return}
+  showLoading(true,"管理データを読み込み中…");
+  const d=await apiFetch({action:"getAll",key:ADMIN_KEY});
+  if(d&&d.ok){
+    interestTags=d.interestTags||[];
+    societyTags=d.societyTags||[];
+    const all=d.members||[];
+    members=all.filter(m=>m.status==="承認");
+    pendingMembers=all.filter(m=>m.status==="未承認");
+  }
+  renderSearch();renderAdminTab();
+  showLoading(false);
+}
 
 // ===== 検索 =====
 function renderSearch(){
@@ -364,8 +389,8 @@ function renderSearch(){
   renderTagGroup("tags-society",societyTags,selectedSociety,"society");
   renderResults();
 }
-function renderTagGroup(elId,list,sel,kind){
-  const g=document.getElementById(elId);g.innerHTML="";
+function renderTagGroup(id,list,sel,kind){
+  const g=document.getElementById(id);g.innerHTML="";
   list.forEach(t=>{const el=document.createElement("span");el.className="tag"+(sel.has(t)?" on "+kind:"");el.textContent=t;
     el.onclick=()=>{sel.has(t)?sel.delete(t):sel.add(t);el.classList.toggle("on");el.classList.toggle(kind);renderResults()};g.appendChild(el)});
 }
@@ -376,7 +401,7 @@ function renderResults(){
   const scored=members.map(m=>{
     const hi=(m.interestTags||[]).filter(t=>selectedInterest.has(t));
     const hs=(m.societyTags||[]).filter(t=>selectedSociety.has(t));
-    return{...m,hi,hs,score:hi.length+hs.length};
+    return{...m,score:hi.length+hs.length};
   }).filter(m=>m.score>0).sort((a,b)=>b.score-a.score);
   if(!scored.length){r.innerHTML='<div class="empty">該当するメンバーが見つかりませんでした。</div>';return}
   let h='<div class="results-label">マッチしたメンバー（'+scored.length+'名）</div>';
@@ -393,41 +418,61 @@ function renderResults(){
 }
 function resetAll(){selectedInterest.clear();selectedSociety.clear();renderSearch()}
 function esc(s){return s.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}
-function copyText(t){navigator.clipboard.writeText(t).then(()=>toast("コピーしました："+t)).catch(()=>toast(t))}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>toast("コピーしました")).catch(()=>toast(t))}
 
-// ===== メンバー登録フォーム =====
+// ===== メンバー登録 =====
 function renderRegisterForm(){
-  const ci=new Set(),cs=new Set();
   document.getElementById("r-tags-interest").innerHTML=interestTags.map(t=>`<label class="cb-label interest"><input type="checkbox" value="${t}">${t}</label>`).join("");
   document.getElementById("r-tags-society").innerHTML=societyTags.map(t=>`<label class="cb-label society"><input type="checkbox" value="${t}">${t}</label>`).join("");
 }
-function submitRegister(){
+async function submitRegister(){
   const name=document.getElementById("r-name").value.trim();
-  const detail=document.getElementById("r-detail").value.trim();
-  const url=document.getElementById("r-url").value.trim();
-  const contact=document.getElementById("r-contact").value.trim();
-  const si=[...document.querySelectorAll("#r-tags-interest input:checked")].map(c=>c.value);
-  const ss=[...document.querySelectorAll("#r-tags-society input:checked")].map(c=>c.value);
   if(!name){toast("名前を入力してください");return}
-  if(members.find(m=>m.name===name)){toast("同じ名前のメンバーが既にいます");return}
-  members.push({name,detail,url,contact,interestTags:si,societyTags:ss});
-  // フォームリセット
-  ["r-name","r-detail","r-url","r-contact"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("register-form-wrap").style.display="none";
-  document.getElementById("register-success").style.display="block";
-  renderSearch();
+  const data={
+    action:"register",name,
+    detail:document.getElementById("r-detail").value.trim(),
+    url:document.getElementById("r-url").value.trim(),
+    contact:document.getElementById("r-contact").value.trim(),
+    interestTags:[...document.querySelectorAll("#r-tags-interest input:checked")].map(c=>c.value),
+    societyTags:[...document.querySelectorAll("#r-tags-society input:checked")].map(c=>c.value)
+  };
+  showLoading(true,"登録中…");
+  const res=await apiFetch(data,"POST");
+  showLoading(false);
+  if(res&&res.ok){
+    document.getElementById("register-form-wrap").style.display="none";
+    document.getElementById("register-success").style.display="block";
+  } else {
+    toast(res?res.error:"登録に失敗しました");
+  }
 }
 function backToSearch(){
   document.getElementById("register-form-wrap").style.display="block";
   document.getElementById("register-success").style.display="none";
+  ["r-name","r-detail","r-url","r-contact"].forEach(id=>document.getElementById(id).value="");
   document.querySelectorAll(".tab")[0].click();
 }
 
+// ===== 承認 =====
+async function approveMember(name){
+  showLoading(true,"承認中…");
+  const res=await apiFetch({action:"approve",name,adminKey:ADMIN_KEY},"POST");
+  showLoading(false);
+  if(res&&res.ok){toast("承認しました："+name);loadAdminData();}
+  else toast(res?res.error:"エラーが発生しました");
+}
+async function rejectMember(name){
+  showLoading(true,"却下中…");
+  const res=await apiFetch({action:"reject",name,adminKey:ADMIN_KEY},"POST");
+  showLoading(false);
+  if(res&&res.ok){toast("却下しました："+name);loadAdminData();}
+  else toast(res?res.error:"エラーが発生しました");
+}
+
 // ===== 管理モーダル =====
-function openModal(idx=-1){
-  const m=idx>=0?members[idx]:null;
+function openModal(m=null){
   document.getElementById("modal-title").textContent=m?"メンバーを編集":"メンバーを追加";
-  document.getElementById("f-edit-idx").value=idx;
+  document.getElementById("f-orig-name").value=m?m.name:"";
   document.getElementById("f-name").value=m?m.name:"";
   document.getElementById("f-detail").value=m?m.detail||"":"";
   document.getElementById("f-url").value=m?m.url||"":"";
@@ -441,90 +486,97 @@ function openModal(idx=-1){
 }
 function closeModal(){document.getElementById("modal-overlay").classList.remove("open")}
 function overlayClick(e){if(e.target===document.getElementById("modal-overlay"))closeModal()}
-function saveMember(){
+async function saveMember(){
   const name=document.getElementById("f-name").value.trim();
-  const detail=document.getElementById("f-detail").value.trim();
-  const url=document.getElementById("f-url").value.trim();
-  const contact=document.getElementById("f-contact").value.trim();
-  const si=[...document.querySelectorAll("#f-tags-interest input:checked")].map(c=>c.value);
-  const ss=[...document.querySelectorAll("#f-tags-society input:checked")].map(c=>c.value);
   if(!name){toast("名前を入力してください");return}
-  const idx=parseInt(document.getElementById("f-edit-idx").value);
-  if(idx>=0){
-    members[idx]={name,detail,url,contact,interestTags:si,societyTags:ss};toast("更新しました")
-  } else {
-    if(members.find(m=>m.name===name)){toast("同じ名前のメンバーが既にいます");return}
-    members.push({name,detail,url,contact,interestTags:si,societyTags:ss});toast("追加しました")
-  }
-  closeModal();renderSearch();renderMemberListEdit();
+  const data={
+    action:"upsertMember",adminKey:ADMIN_KEY,name,
+    detail:document.getElementById("f-detail").value.trim(),
+    url:document.getElementById("f-url").value.trim(),
+    contact:document.getElementById("f-contact").value.trim(),
+    interestTags:[...document.querySelectorAll("#f-tags-interest input:checked")].map(c=>c.value),
+    societyTags:[...document.querySelectorAll("#f-tags-society input:checked")].map(c=>c.value)
+  };
+  showLoading(true,"保存中…");
+  const res=await apiFetch(data,"POST");
+  showLoading(false);
+  if(res&&res.ok){toast("保存しました");closeModal();loadAdminData();}
+  else toast(res?res.error:"保存に失敗しました");
+}
+async function deleteMember(name){
+  showLoading(true,"削除中…");
+  const res=await apiFetch({action:"delete",name,adminKey:ADMIN_KEY},"POST");
+  showLoading(false);
+  if(res&&res.ok){toast("削除しました："+name);loadAdminData();}
+  else toast(res?res.error:"削除に失敗しました");
 }
 
-// ===== 管理タブ =====
-function renderTagManage(){
-  document.getElementById("tag-manage-interest").innerHTML=interestTags.map((t,i)=>`<div class="tag-manage-row"><span class="tag-manage-name">${t}</span><button class="icon-btn del" onclick="delTag('interest',${i})">×</button></div>`).join("");
-  document.getElementById("tag-manage-society").innerHTML=societyTags.map((t,i)=>`<div class="tag-manage-row"><span class="tag-manage-name">${t}</span><button class="icon-btn del" onclick="delTag('society',${i})">×</button></div>`).join("");
-}
-function renderMemberListEdit(){
-  const el=document.getElementById("member-list-edit");
-  if(!members.length){el.innerHTML='<div class="empty">まだメンバーがいません。</div>';return}
-  el.innerHTML=members.map((m,i)=>{const c=colorFor(m.name);
-    const meta=[m.url?"🔗":null,m.contact?"📬":null].filter(Boolean).join(" ");
-    const itags=(m.interestTags||[]).map(t=>`<span class="me-tag-i">${t}</span>`).join("");
-    const stags=(m.societyTags||[]).map(t=>`<span class="me-tag-s">${t}</span>`).join("");
-    return`<div class="me-row"><div class="me-avatar" style="background:${c}">${m.name.charAt(0)}</div><div class="me-info"><div class="me-name">${m.name}${meta?` <span class="me-meta">${meta}</span>`:""}</div><div class="me-tags">${itags}${stags}</div></div><div class="me-actions"><button class="icon-btn" onclick="openModal(${i})">✏️</button><button class="icon-btn del" onclick="delMember(${i})">×</button></div></div>`}).join("")
-}
-function renderAdminTab(){
-  renderTagManage();renderMemberListEdit();
-  document.getElementById("current-code-display").textContent=ACCESS_CODE;
-  updateExport();
-}
-function addTag(kind){
+// ===== タグ管理 =====
+async function addTag(kind){
   const id=kind==="interest"?"new-tag-interest":"new-tag-society";
   const inp=document.getElementById(id),v=inp.value.trim();
   if(!v)return;
   const list=kind==="interest"?interestTags:societyTags;
   if(list.includes(v)){toast("そのタグは既に存在します");return}
-  list.push(v);inp.value="";renderAdminTab();renderSearch();renderRegisterForm();toast("タグを追加しました")
+  list.push(v);inp.value="";
+  await syncTags();
+  renderSearch();renderAdminTab();toast("タグを追加しました")
 }
-function delTag(kind,i){
+async function delTag(kind,i){
   const list=kind==="interest"?interestTags:societyTags;
-  const t=list[i];list.splice(i,1);
-  members.forEach(m=>{
-    if(kind==="interest")m.interestTags=(m.interestTags||[]).filter(x=>x!==t);
-    else m.societyTags=(m.societyTags||[]).filter(x=>x!==t);
-  });
-  renderAdminTab();renderSearch();renderRegisterForm();toast(`「${t}」を削除しました`)
+  list.splice(i,1);
+  await syncTags();
+  renderSearch();renderAdminTab();toast("タグを削除しました")
 }
-function delMember(i){
-  const name=members[i].name;members.splice(i,1);
-  renderMemberListEdit();renderSearch();toast(`「${name}」を削除しました`)
+async function syncTags(){
+  await apiFetch({action:"updateTags",adminKey:ADMIN_KEY,interestTags,societyTags},"POST");
 }
-function updateExport(){document.getElementById("export-box").value=JSON.stringify({interestTags,societyTags,members},null,2)}
-function copyExport(){
-  const t=document.getElementById("export-box");t.select();
-  try{document.execCommand("copy")}catch{navigator.clipboard.writeText(t.value)}
-  toast("コピーしました")
+
+// ===== 管理タブ描画 =====
+function renderAdminTab(){
+  // 承認待ち
+  const pl=document.getElementById("pending-list");
+  if(!pendingMembers.length){pl.innerHTML='<div class="empty">承認待ちのメンバーはいません。</div>'}
+  else pl.innerHTML=pendingMembers.map(m=>{
+    const itags=(m.interestTags||[]).map(t=>`<span class="pending-tag-i">${t}</span>`).join("");
+    const stags=(m.societyTags||[]).map(t=>`<span class="pending-tag-s">${t}</span>`).join("");
+    return`<div class="pending-banner"><div class="pending-banner-icon">👤</div><div class="pending-banner-info"><div class="pending-name">${m.name}</div><div class="pending-detail">${m.detail||""}</div><div class="pending-tags">${itags}${stags}</div><div class="pending-btns"><button class="approve-btn" onclick="approveMember('${esc(m.name)}')">承認</button><button class="reject-btn" onclick="rejectMember('${esc(m.name)}')">却下</button></div></div></div>`}).join("");
+  // 承認済み
+  const ml=document.getElementById("member-list-edit");
+  if(!members.length){ml.innerHTML='<div class="empty">承認済みのメンバーはいません。</div>'}
+  else ml.innerHTML=members.map(m=>{const c=colorFor(m.name);
+    const meta=[m.url?"🔗":null,m.contact?"📬":null].filter(Boolean).join(" ");
+    const itags=(m.interestTags||[]).map(t=>`<span class="me-tag-i">${t}</span>`).join("");
+    const stags=(m.societyTags||[]).map(t=>`<span class="me-tag-s">${t}</span>`).join("");
+    return`<div class="me-row"><div class="me-avatar" style="background:${c}">${m.name.charAt(0)}</div><div class="me-info"><div class="me-name">${m.name}${meta?` <span class="me-meta">${meta}</span>`:""}</div><div class="me-tags">${itags}${stags}</div></div><div class="me-actions"><button class="icon-btn" onclick='openModal(${JSON.stringify(m)})'>✏️</button><button class="icon-btn del" onclick="deleteMember('${esc(m.name)}')">×</button></div></div>`}).join("");
+  // タグ管理
+  document.getElementById("tag-manage-interest").innerHTML=interestTags.map((t,i)=>`<div class="tag-manage-row"><span class="tag-manage-name">${t}</span><button class="icon-btn del" onclick="delTag('interest',${i})">×</button></div>`).join("");
+  document.getElementById("tag-manage-society").innerHTML=societyTags.map((t,i)=>`<div class="tag-manage-row"><span class="tag-manage-name">${t}</span><button class="icon-btn del" onclick="delTag('society',${i})">×</button></div>`).join("");
+  // 設定欄の現在値
+  document.getElementById("s-url").value=SCRIPT_URL;
+  document.getElementById("s-adminkey").value=ADMIN_KEY;
+  document.getElementById("s-password").value=ACCESS_CODE;
 }
-function importData(){
-  const raw=prompt("JSONを貼り付けてください：");if(!raw)return;
-  try{
-    const d=JSON.parse(raw);if(!d.members)throw 0;
-    interestTags=d.interestTags||interestTags;
-    societyTags=d.societyTags||societyTags;
-    members=d.members;renderAdminTab();renderSearch();renderRegisterForm();toast("インポートしました")
-  }catch{toast("JSONの形式が正しくありません")}
+
+// ===== 設定保存 =====
+function saveSettings(){
+  const url=document.getElementById("s-url").value.trim();
+  const ak=document.getElementById("s-adminkey").value.trim();
+  const pw=document.getElementById("s-password").value.trim();
+  if(url)SCRIPT_URL=url;
+  if(ak)ADMIN_KEY=ak;
+  if(pw)ACCESS_CODE=pw;
+  document.getElementById("settings-hint").textContent="✅ 保存しました。「HTMLとして保存」で確定してください。";
+  toast("設定を更新しました")
 }
+
+// ===== HTMLダウンロード =====
 function downloadHtml(){
   const src=document.documentElement.outerHTML;
-  const updated=src
-    .replace(
-      /let ACCESS_CODE\s*=\s*"[^"]*"/,
-      `let ACCESS_CODE = "${ACCESS_CODE}"`
-    )
-    .replace(
-      /let interestTags=\[[\s\S]*?\];[\s\n]*let societyTags=\[[\s\S]*?\];[\s\n]*let members=\[[\s\S]*?\];/,
-      `let interestTags=${JSON.stringify(interestTags)};\nlet societyTags=${JSON.stringify(societyTags)};\nlet members=${JSON.stringify(members)};`
-    );
+  const updated=src.replace(
+    /let SCRIPT_URL\s*=\s*"[^"]*";\s*\/\/.*\n\s*let ADMIN_KEY\s*=\s*"[^"]*";\s*\/\/.*\n\s*let ACCESS_CODE\s*=\s*"[^"]*";/,
+    `let SCRIPT_URL  = "${SCRIPT_URL}";\n\t\t\tlet ADMIN_KEY   = "${ADMIN_KEY}";\n\t\t\tlet ACCESS_CODE = "${ACCESS_CODE}";`
+  );
   const blob=new Blob([updated],{type:"text/html;charset=utf-8"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);
   a.download="fujita_matching.html";a.click();URL.revokeObjectURL(a.href);
@@ -534,17 +586,13 @@ function downloadHtml(){
 // ===== タブ切り替え =====
 function switchTab(id,btn){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));btn.classList.add("active");
-  ["search","register","admin"].forEach(t=>{
-    document.getElementById("tab-"+t).style.display=t===id?"":"none";
-  });
+  ["search","register","admin"].forEach(t=>{document.getElementById("tab-"+t).style.display=t===id?"":"none"});
   document.getElementById("fab").style.display=id==="admin"?"flex":"none";
-  if(id==="admin")renderAdminTab();
+  if(id==="admin")loadAdminData();
   if(id==="register")renderRegisterForm();
 }
 
-function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2200)}
-
-renderSearch();
+function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2500)}
 </script>
 </body>
 </html>
