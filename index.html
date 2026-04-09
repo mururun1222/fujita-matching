@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>藤田総診 つながりマッチング</title>
+<style>
+:root{
+  --bg1:#fff;--bg2:#f5f5f3;--t1:#1a1a1a;--t2:#6b6b6b;--t3:#999;
+  --bd1:rgba(0,0,0,0.10);--bd2:rgba(0,0,0,0.22);
+  --accent:#534AB7;--accent-bg:#EEEDFE;--accent-text:#3C3489;
+  --accent2:#1D7A5F;--accent2-bg:#E3F5F0;--accent2-text:#155C47;
+  --danger:#c0392b;--danger-bg:#fdf0ef;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg1:#1e1e1e;--bg2:#2a2a2a;--t1:#e8e8e8;--t2:#a0a0a0;--t3:#666;
+  --bd1:rgba(255,255,255,0.10);--bd2:rgba(255,255,255,0.22);
+  --accent-bg:#3C3489;--accent-text:#CECBF6;
+  --accent2-bg:#1A4A3A;--accent2-text:#7ECFB8;
+  --danger-bg:#3a1a18;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;font-size:15px}
+
+/* ロック */
+#lock-screen{position:fixed;inset:0;background:var(--bg1);display:flex;align-items:center;justify-content:center;z-index:999;padding:2rem}
+.lock-box{width:100%;max-width:340px;text-align:center}
+.lock-icon{font-size:48px;margin-bottom:1rem}
+.lock-title{font-size:20px;font-weight:600;margin-bottom:6px}
+.lock-sub{font-size:13px;color:var(--t2);margin-bottom:1.75rem;line-height:1.65}
+.lock-input{width:100%;padding:13px 16px;border:1px solid var(--bd2);border-radius:10px;font-size:15px;background:var(--bg1);color:var(--t1);outline:none;text-align:center;letter-spacing:.1em;margin-bottom:10px;-webkit-appearance:none;transition:border .15s}
+.lock-input:focus{border-color:var(--accent)}
+.lock-btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.lock-btn:hover{opacity:.88}
+.lock-err{font-size:13px;color:var(--danger);margin-top:8px;min-height:18px}
+
+/* メイン */
+#main{display:none}
+#app{max-width:580px;margin:0 auto;padding:1.5rem 1rem 5rem}
+.tabs{display:flex;gap:4px;margin-bottom:1.5rem;background:var(--bg2);border-radius:10px;padding:4px}
+.tab{flex:1;padding:8px;border:none;border-radius:7px;background:transparent;color:var(--t2);font-size:13px;cursor:pointer;transition:all .15s;font-weight:500;white-space:nowrap}
+.tab.active{background:var(--bg1);color:var(--t1);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.hd{font-size:20px;font-weight:600;margin-bottom:4px}
+.sub{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:1.25rem}
+
+/* タグ */
+.tag-group{margin-bottom:1.25rem}
+.tag-group-label{font-size:11px;font-weight:600;letter-spacing:.07em;color:var(--t3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.tag-group-label::after{content:"";flex:1;height:1px;background:var(--bd1)}
+.tag-grid{display:flex;flex-wrap:wrap;gap:7px}
+.tag{padding:7px 15px;border-radius:100px;font-size:13px;cursor:pointer;transition:all .15s;border:1px solid var(--bd2);background:var(--bg1);color:var(--t1);user-select:none;-webkit-tap-highlight-color:transparent}
+.tag:active{transform:scale(.97)}
+.tag.on.interest{border-color:var(--accent);background:var(--accent-bg);color:var(--accent-text)}
+.tag.on.society{border-color:var(--accent2);background:var(--accent2-bg);color:var(--accent2-text)}
+.divider{height:1px;background:var(--bd1);margin:0 0 1.25rem}
+.results-label{font-size:12px;color:var(--t3);letter-spacing:.04em;margin-bottom:12px}
+.empty{font-size:14px;color:var(--t2);line-height:1.7}
+
+/* メンバーカード */
+.member-card{background:var(--bg1);border:1px solid var(--bd1);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.mc-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.mc-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0}
+.mc-name{font-size:15px;font-weight:500}.mc-match{font-size:12px;color:var(--t2);margin-left:auto}
+.mc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.mc-tag{font-size:12px;padding:3px 10px;border-radius:100px;background:var(--bg2);color:var(--t2)}
+.mc-tag.hit-interest{background:var(--accent-bg);color:var(--accent-text)}
+.mc-tag.hit-society{background:var(--accent2-bg);color:var(--accent2-text)}
+.mc-detail{font-size:13px;color:var(--t2);margin-top:8px;line-height:1.5}
+.mc-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.mc-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 12px;border-radius:100px;border:1px solid var(--bd2);color:var(--accent-text);background:var(--accent-bg);text-decoration:none;transition:opacity .15s}
+.mc-link:hover{opacity:.75}
+.mc-contact{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:5px 12px;border-radius:100px;border:1px solid var(--bd2);color:var(--t2);background:var(--bg2);cursor:pointer;transition:opacity .15s}
+.mc-contact:hover{opacity:.75}
+.bar-wrap{height:3px;background:var(--bd1);border-radius:2px;margin-top:6px;overflow:hidden}
+.bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+.reset-btn{display:inline-block;margin-top:8px;padding:8px 16px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--t2);font-size:13px;cursor:pointer}
+
+/* メンバー登録フォーム */
+.register-box{background:var(--bg2);border-radius:14px;padding:20px}
+.register-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.register-sub{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12px;color:var(--t2);margin-bottom:5px;font-weight:500}
+.field input,.field textarea{width:100%;padding:10px 13px;border:1px solid var(--bd2);border-radius:9px;background:var(--bg1);color:var(--t1);font-size:14px;font-family:inherit;outline:none;transition:border .15s;-webkit-appearance:none}
+.field input:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:72px;line-height:1.5}
+.field .hint{font-size:11px;color:var(--t3);margin-top:4px}
+.checkbox-group-label{font-size:12px;font-weight:600;color:var(--t2);margin:12px 0 7px}
+.checkbox-grid{display:flex;flex-wrap:wrap;gap:7px}
+.cb-label{display:flex;align-items:center;gap:6px;padding:7px 13px;border:1px solid var(--bd2);border-radius:100px;font-size:13px;cursor:pointer;transition:all .15s;user-select:none;background:var(--bg1)}
+.cb-label.interest:has(input:checked){border-color:var(--accent);background:var(--accent-bg);color:var(--accent-text)}
+.cb-label.society:has(input:checked){border-color:var(--accent2);background:var(--accent2-bg);color:var(--accent2-text)}
+.cb-label input{display:none}
+.submit-btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;transition:opacity .15s}
+.submit-btn:hover{opacity:.88}
+.success-box{text-align:center;padding:2rem 1rem}
+.success-icon{font-size:48px;margin-bottom:12px}
+.success-title{font-size:18px;font-weight:600;margin-bottom:8px}
+.success-sub{font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:20px}
+.back-btn{padding:10px 24px;border:1px solid var(--bd2);border-radius:9px;background:transparent;color:var(--t1);font-size:14px;cursor:pointer}
+
+/* FAB & モーダル（管理） */
+.fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;font-size:26px;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(83,74,183,.45);display:flex;align-items:center;justify-content:center;transition:transform .15s;z-index:100}
+.fab:hover{transform:scale(1.08)}.fab:active{transform:scale(.95)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg1);border-radius:20px 20px 0 0;width:100%;max-width:580px;max-height:90dvh;overflow-y:auto;padding:0 0 2rem;transform:translateY(40px);transition:transform .25s cubic-bezier(.22,1,.36,1)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;position:sticky;top:0;background:var(--bg1);border-bottom:1px solid var(--bd1);z-index:1}
+.modal-title{font-size:17px;font-weight:600}
+.modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--bg2);color:var(--t2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:16px 20px 0}
+.modal-footer{padding:16px 20px 0;display:flex;gap:10px}
+.btn-cancel{flex:1;padding:12px;border:1px solid var(--bd2);border-radius:10px;background:transparent;color:var(--t2);font-size:14px;font-weight:500;cursor:pointer}
+.btn-save{flex:2;padding:12px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.btn-save:hover{opacity:.88}
+
+/* 管理タブ */
+.section-title{font-size:13px;font-weight:600;color:var(--t2);letter-spacing:.05em;margin-bottom:10px;margin-top:1.5rem}
+.section-title:first-child{margin-top:0}
+.tag-section-hd{font-size:12px;font-weight:600;color:var(--t2);margin:10px 0 6px;padding:4px 8px;border-radius:6px;background:var(--bg2);display:inline-block}
+.tag-manage-row{display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--bd1);border-radius:8px;margin-bottom:6px}
+.tag-manage-name{flex:1;font-size:14px}
+.tag-add-row{display:flex;gap:6px;margin-top:4px;margin-bottom:12px}
+.tag-add-row input{flex:1;padding:8px 12px;border:1px solid var(--bd2);border-radius:8px;background:var(--bg1);color:var(--t1);font-size:13px;outline:none}
+.tag-add-row input:focus{border-color:var(--accent)}
+.tag-add-row .btn-i{padding:8px 14px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.tag-add-row .btn-s{padding:8px 14px;border:none;border-radius:8px;background:var(--accent2);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.member-list-edit{margin-top:4px}
+.me-row{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border:1px solid var(--bd1);border-radius:10px;margin-bottom:7px}
+.me-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0;margin-top:1px}
+.me-info{flex:1;min-width:0}
+.me-name{font-size:14px;font-weight:500;margin-bottom:3px}
+.me-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:2px}
+.me-tag-i{font-size:11px;padding:2px 8px;border-radius:100px;background:var(--accent-bg);color:var(--accent-text)}
+.me-tag-s{font-size:11px;padding:2px 8px;border-radius:100px;background:var(--accent2-bg);color:var(--accent2-text)}
+.me-meta{font-size:11px;color:var(--t3)}
+.me-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.icon-btn{width:28px;height:28px;border:1px solid var(--bd2);border-radius:7px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:14px;transition:all .15s}
+.icon-btn:hover{background:var(--bg2)}.icon-btn.del:hover{background:var(--danger-bg);color:var(--danger);border-color:var(--danger)}
+
+/* パスワード設定 */
+.code-box{background:var(--bg2);border-radius:10px;padding:14px 16px;margin-bottom:8px}
+.code-row{display:flex;align-items:center;gap:8px}
+.code-row input{flex:1;padding:9px 12px;border:1px solid var(--bd2);border-radius:8px;background:var(--bg1);color:var(--t1);font-size:14px;font-family:monospace;outline:none}
+.code-row input:focus{border-color:var(--accent)}
+.code-row button{padding:9px 14px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.code-hint{font-size:12px;color:var(--t3);margin-top:8px;line-height:1.6}
+
+/* 保存 */
+.save-btn-wrap{margin-top:1rem}
+.save-btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent2);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.save-btn:hover{opacity:.88}
+.export-area textarea{width:100%;height:160px;padding:10px;border:1px solid var(--bd2);border-radius:8px;background:var(--bg2);color:var(--t1);font-size:12px;font-family:monospace;resize:vertical;outline:none;margin-top:6px}
+.export-btns{display:flex;gap:8px;margin-top:8px}
+.export-btns button{flex:1;padding:9px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--t1);font-size:13px;font-weight:500;cursor:pointer}
+.export-btns button:hover{background:var(--bg2)}
+
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:100px;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;z-index:9999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ロック画面 -->
+<div id="lock-screen">
+  <div class="lock-box">
+    <div class="lock-icon">🏥</div>
+    <div class="lock-title">藤田総診 つながりマッチング</div>
+    <div class="lock-sub">メンバー限定のページです。<br>パスワードを入力してください。</div>
+    <input class="lock-input" id="lock-input" type="password" placeholder="パスワード" autocomplete="off">
+    <button class="lock-btn" onclick="tryUnlock()">入る</button>
+    <div class="lock-err" id="lock-err"></div>
+  </div>
+</div>
+
+<!-- メイン -->
+<div id="main">
+<div id="app">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('search',this)">🔍 検索</button>
+    <button class="tab" onclick="switchTab('register',this)">✋ 登録</button>
+    <button class="tab" onclick="switchTab('admin',this)">⚙️ 管理</button>
+  </div>
+
+  <!-- 検索タブ -->
+  <div id="tab-search">
+    <div class="hd">藤田総診 つながりマッチング</div>
+    <div class="sub">気になるキーワードをタップ。選んだ分野に近いメンバーが表示されます。</div>
+    <div class="tag-group">
+      <div class="tag-group-label">💡 興味・関心</div>
+      <div class="tag-grid" id="tags-interest"></div>
+    </div>
+    <div class="tag-group">
+      <div class="tag-group-label">🏛️ 関わっている学会</div>
+      <div class="tag-grid" id="tags-society"></div>
+    </div>
+    <div class="divider"></div>
+    <div id="results"></div>
+  </div>
+
+  <!-- 登録タブ -->
+  <div id="tab-register" style="display:none">
+    <div id="register-form-wrap">
+      <div class="register-box">
+        <div class="register-title">✋ メンバー登録</div>
+        <div class="register-sub">あなたの情報を登録して、つながりを広げましょう。<br>入力後「登録する」を押してください。</div>
+        <div class="field"><label>名前 *</label><input id="r-name" type="text" placeholder="例：田中"></div>
+        <div class="field"><label>一言コメント</label><textarea id="r-detail" placeholder="例：総合診療 × 産業保健。予防医療に関心があります。"></textarea></div>
+        <div class="field">
+          <label>URL（プロフィール・SNS・researchmapなど）</label>
+          <input id="r-url" type="url" placeholder="https://...">
+          <div class="hint">複数ある場合はカンマ区切り</div>
+        </div>
+        <div class="field"><label>連絡先（メール・LINE WORKSなど）</label><input id="r-contact" type="text" placeholder="例：tanaka@example.com"></div>
+        <div class="field">
+          <label>タグを選択してください（複数可）</label>
+          <div class="checkbox-group-label">💡 興味・関心</div>
+          <div class="checkbox-grid" id="r-tags-interest"></div>
+          <div class="checkbox-group-label">🏛️ 関わっている学会</div>
+          <div class="checkbox-grid" id="r-tags-society"></div>
+        </div>
+        <button class="submit-btn" onclick="submitRegister()">登録する</button>
+      </div>
+    </div>
+    <div id="register-success" style="display:none">
+      <div class="success-box">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">登録が完了しました！</div>
+        <div class="success-sub">メンバー一覧に追加されました。<br>検索タブから確認できます。</div>
+        <button class="back-btn" onclick="backToSearch()">検索画面に戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理タブ -->
+  <div id="tab-admin" style="display:none">
+    <div class="section-title">🏷️ タグ管理</div>
+    <div class="tag-section-hd">💡 興味・関心タグ</div>
+    <div id="tag-manage-interest"></div>
+    <div class="tag-add-row">
+      <input id="new-tag-interest" type="text" placeholder="興味・関心タグを追加…">
+      <button class="btn-i" onclick="addTag('interest')">追加</button>
+    </div>
+    <div class="tag-section-hd">🏛️ 学会タグ</div>
+    <div id="tag-manage-society"></div>
+    <div class="tag-add-row">
+      <input id="new-tag-society" type="text" placeholder="学会名を追加…">
+      <button class="btn-s" onclick="addTag('society')">追加</button>
+    </div>
+
+    <div class="section-title" style="margin-top:2rem">👥 登録済みメンバー</div>
+    <div id="member-list-edit" class="member-list-edit"></div>
+
+    <div class="section-title" style="margin-top:2rem">🔑 パスワード変更</div>
+    <div class="code-box">
+      <div class="code-row">
+        <input id="code-input" type="text" placeholder="新しいパスワードを入力">
+        <button onclick="saveCode()">変更</button>
+      </div>
+      <div class="code-hint">現在のパスワード：<strong id="current-code-display"></strong></div>
+    </div>
+
+    <div class="section-title" style="margin-top:2rem">💾 HTMLとして保存</div>
+    <div class="save-btn-wrap">
+      <button class="save-btn" onclick="downloadHtml()">⬇️ 最新データを含むHTMLをダウンロード</button>
+    </div>
+    <div style="margin-top:1.5rem" class="export-area">
+      <label style="font-size:12px;color:var(--t2)">JSONデータ</label>
+      <textarea id="export-box" readonly></textarea>
+      <div class="export-btns">
+        <button onclick="copyExport()">📋 コピー</button>
+        <button onclick="importData()">📥 JSONを読み込む</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 管理用 編集モーダル -->
+<button class="fab" id="fab" onclick="openModal()" title="メンバーを追加">＋</button>
+<div class="modal-overlay" id="modal-overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">メンバーを追加</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="f-edit-idx" value="-1">
+      <div class="field"><label>名前 *</label><input id="f-name" type="text" placeholder="例：田中"></div>
+      <div class="field"><label>一言コメント</label><textarea id="f-detail" placeholder="例：総合診療 × 産業保健。予防医療に関心。"></textarea></div>
+      <div class="field">
+        <label>URL</label>
+        <input id="f-url" type="url" placeholder="https://...">
+        <div class="hint">カンマ区切りで複数入力可</div>
+      </div>
+      <div class="field"><label>連絡先</label><input id="f-contact" type="text" placeholder="例：tanaka@example.com"></div>
+      <div class="field">
+        <label>タグ</label>
+        <div class="checkbox-group-label">💡 興味・関心</div>
+        <div class="checkbox-grid" id="f-tags-interest"></div>
+        <div class="checkbox-group-label">🏛️ 学会</div>
+        <div class="checkbox-grid" id="f-tags-society"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="btn-save" onclick="saveMember()">保存する</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== パスワード =====
+let ACCESS_CODE = "fujita2024"; // ← ここを変更するか、管理タブから変更
+
+function tryUnlock(){
+  const v=document.getElementById("lock-input").value.trim();
+  if(v===ACCESS_CODE){
+    document.getElementById("lock-screen").style.display="none";
+    document.getElementById("main").style.display="block";
+  } else {
+    document.getElementById("lock-err").textContent="パスワードが正しくありません。";
+    document.getElementById("lock-input").value="";
+  }
+}
+document.getElementById("lock-input").addEventListener("keydown",e=>{if(e.key==="Enter")tryUnlock()});
+
+function saveCode(){
+  const v=document.getElementById("code-input").value.trim();
+  if(!v){toast("パスワードを入力してください");return}
+  ACCESS_CODE=v;
+  document.getElementById("code-input").value="";
+  document.getElementById("current-code-display").textContent=ACCESS_CODE;
+  toast("パスワードを変更しました。HTMLを保存して再配布してください")
+}
+
+// ===== データ =====
+const COLORS=["#534AB7","#1D9E75","#D4537E","#378ADD","#0F6E56","#BA7517","#D85A30","#993C1D","#639922","#185FA5","#993556","#7B4DA8","#2C8C6B"];
+function colorFor(n){let h=0;for(let c of n)h=(h*31+c.charCodeAt(0))%COLORS.length;return COLORS[h]}
+
+let interestTags=["こころの医療","子どもの発達・思春期","女性の健康・周産期","母子保健","離島・へき地医療","産業保健・働く人の健康","健康経営・予防医療","起業・ビジネス","テクノロジー × 医療","公衆衛生・MPH","災害医療・国際保健","留学・海外経験","アート × 医療"];
+let societyTags=["日本プライマリ・ケア連合学会","日本内科学会","日本総合診療医学会","日本病院総合診療医学会","日本老年医学会","日本緩和医療学会","日本救急医学会","日本在宅医学会","日本医療情報学会"];
+let members=[
+  {name:"中込",interestTags:["起業・ビジネス","産業保健・働く人の健康","健康経営・予防医療","テクノロジー × 医療"],societyTags:[],detail:"総合診療 × アントレプレナーシップ。産業保健・予防医療・テクノロジーを掛け合わせたキャリアを実践中。",url:"",contact:""},
+  {name:"石川",interestTags:["起業・ビジネス","子どもの発達・思春期","こころの医療"],societyTags:[],detail:"アントレプレナーシップと児童精神を両軸に。発達障害の二次障害に特に関心。",url:"",contact:""},
+  {name:"石原",interestTags:["こころの医療","子どもの発達・思春期","女性の健康・周産期","母子保健"],societyTags:[],detail:"精神科・心療内科領域を軸に、婦人科・母子保健まで幅広くカバー。",url:"",contact:""},
+  {name:"黒田",interestTags:["こころの医療"],societyTags:[],detail:"心療内科・精神科連携に取り組む。",url:"",contact:""},
+  {name:"森",interestTags:["こころの医療"],societyTags:[],detail:"心療内科・精神科連携に取り組む。",url:"",contact:""},
+  {name:"山本",interestTags:["産業保健・働く人の健康"],societyTags:[],detail:"産業保健の実践者。",url:"",contact:""},
+  {name:"根本",interestTags:["離島・へき地医療"],societyTags:[],detail:"離島診療の現場経験を持つ。",url:"",contact:""},
+  {name:"吉澤",interestTags:["離島・へき地医療"],societyTags:[],detail:"離島診療の現場経験を持つ。",url:"",contact:""},
+  {name:"青山幸",interestTags:["母子保健","離島・へき地医療"],societyTags:[],detail:"母子保健と離島医療を掛け合わせた実践。",url:"",contact:""},
+  {name:"道川",interestTags:["公衆衛生・MPH","災害医療・国際保健"],societyTags:[],detail:"MPHホルダー。災害医療にも精通。",url:"",contact:""},
+  {name:"本多",interestTags:["公衆衛生・MPH","留学・海外経験","アート × 医療"],societyTags:[],detail:"MPH・留学経験あり。アート × 医療という独自の視点を持つ。",url:"",contact:""}
+];
+let selectedInterest=new Set(),selectedSociety=new Set();
+
+// ===== 検索 =====
+function renderSearch(){
+  renderTagGroup("tags-interest",interestTags,selectedInterest,"interest");
+  renderTagGroup("tags-society",societyTags,selectedSociety,"society");
+  renderResults();
+}
+function renderTagGroup(elId,list,sel,kind){
+  const g=document.getElementById(elId);g.innerHTML="";
+  list.forEach(t=>{const el=document.createElement("span");el.className="tag"+(sel.has(t)?" on "+kind:"");el.textContent=t;
+    el.onclick=()=>{sel.has(t)?sel.delete(t):sel.add(t);el.classList.toggle("on");el.classList.toggle(kind);renderResults()};g.appendChild(el)});
+}
+function renderResults(){
+  const r=document.getElementById("results");
+  if(!selectedInterest.size&&!selectedSociety.size){r.innerHTML='<div class="empty">タグを選ぶと関連するメンバーが表示されます。</div>';return}
+  const total=selectedInterest.size+selectedSociety.size;
+  const scored=members.map(m=>{
+    const hi=(m.interestTags||[]).filter(t=>selectedInterest.has(t));
+    const hs=(m.societyTags||[]).filter(t=>selectedSociety.has(t));
+    return{...m,hi,hs,score:hi.length+hs.length};
+  }).filter(m=>m.score>0).sort((a,b)=>b.score-a.score);
+  if(!scored.length){r.innerHTML='<div class="empty">該当するメンバーが見つかりませんでした。</div>';return}
+  let h='<div class="results-label">マッチしたメンバー（'+scored.length+'名）</div>';
+  scored.forEach(m=>{
+    const p=Math.round(m.score/total*100),c=colorFor(m.name);
+    const urls=(m.url||"").split(",").map(s=>s.trim()).filter(Boolean);
+    const urlLinks=urls.map(u=>`<a class="mc-link" href="${esc(u)}" target="_blank" rel="noopener">🔗 プロフィール</a>`).join("");
+    const contactLink=m.contact?`<span class="mc-contact" onclick="copyText('${esc(m.contact)}')">📬 ${esc(m.contact)}</span>`:"";
+    const itags=(m.interestTags||[]).map(t=>`<span class="mc-tag${selectedInterest.has(t)?" hit-interest":""}">${t}</span>`).join("");
+    const stags=(m.societyTags||[]).map(t=>`<span class="mc-tag${selectedSociety.has(t)?" hit-society":""}">${t}</span>`).join("");
+    h+=`<div class="member-card"><div class="mc-top"><div class="mc-avatar" style="background:${c}">${m.name.charAt(0)}</div><div class="mc-name">${m.name}</div><div class="mc-match">${m.score}/${total}</div></div><div class="bar-wrap"><div class="bar-fill" style="width:${p}%"></div></div><div class="mc-tags">${itags}${stags}</div>${m.detail?`<div class="mc-detail">${m.detail}</div>`:""}${urlLinks||contactLink?`<div class="mc-links">${urlLinks}${contactLink}</div>`:""}</div>`;
+  });
+  h+='<button class="reset-btn" onclick="resetAll()">リセット</button>';r.innerHTML=h;
+}
+function resetAll(){selectedInterest.clear();selectedSociety.clear();renderSearch()}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>toast("コピーしました："+t)).catch(()=>toast(t))}
+
+// ===== メンバー登録フォーム =====
+function renderRegisterForm(){
+  const ci=new Set(),cs=new Set();
+  document.getElementById("r-tags-interest").innerHTML=interestTags.map(t=>`<label class="cb-label interest"><input type="checkbox" value="${t}">${t}</label>`).join("");
+  document.getElementById("r-tags-society").innerHTML=societyTags.map(t=>`<label class="cb-label society"><input type="checkbox" value="${t}">${t}</label>`).join("");
+}
+function submitRegister(){
+  const name=document.getElementById("r-name").value.trim();
+  const detail=document.getElementById("r-detail").value.trim();
+  const url=document.getElementById("r-url").value.trim();
+  const contact=document.getElementById("r-contact").value.trim();
+  const si=[...document.querySelectorAll("#r-tags-interest input:checked")].map(c=>c.value);
+  const ss=[...document.querySelectorAll("#r-tags-society input:checked")].map(c=>c.value);
+  if(!name){toast("名前を入力してください");return}
+  if(members.find(m=>m.name===name)){toast("同じ名前のメンバーが既にいます");return}
+  members.push({name,detail,url,contact,interestTags:si,societyTags:ss});
+  // フォームリセット
+  ["r-name","r-detail","r-url","r-contact"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("register-form-wrap").style.display="none";
+  document.getElementById("register-success").style.display="block";
+  renderSearch();
+}
+function backToSearch(){
+  document.getElementById("register-form-wrap").style.display="block";
+  document.getElementById("register-success").style.display="none";
+  document.querySelectorAll(".tab")[0].click();
+}
+
+// ===== 管理モーダル =====
+function openModal(idx=-1){
+  const m=idx>=0?members[idx]:null;
+  document.getElementById("modal-title").textContent=m?"メンバーを編集":"メンバーを追加";
+  document.getElementById("f-edit-idx").value=idx;
+  document.getElementById("f-name").value=m?m.name:"";
+  document.getElementById("f-detail").value=m?m.detail||"":"";
+  document.getElementById("f-url").value=m?m.url||"":"";
+  document.getElementById("f-contact").value=m?m.contact||"":"";
+  const ci=m?new Set(m.interestTags||[]):new Set();
+  const cs=m?new Set(m.societyTags||[]):new Set();
+  document.getElementById("f-tags-interest").innerHTML=interestTags.map(t=>`<label class="cb-label interest"><input type="checkbox" value="${t}"${ci.has(t)?" checked":""}>${t}</label>`).join("");
+  document.getElementById("f-tags-society").innerHTML=societyTags.map(t=>`<label class="cb-label society"><input type="checkbox" value="${t}"${cs.has(t)?" checked":""}>${t}</label>`).join("");
+  document.getElementById("modal-overlay").classList.add("open");
+  setTimeout(()=>document.getElementById("f-name").focus(),300);
+}
+function closeModal(){document.getElementById("modal-overlay").classList.remove("open")}
+function overlayClick(e){if(e.target===document.getElementById("modal-overlay"))closeModal()}
+function saveMember(){
+  const name=document.getElementById("f-name").value.trim();
+  const detail=document.getElementById("f-detail").value.trim();
+  const url=document.getElementById("f-url").value.trim();
+  const contact=document.getElementById("f-contact").value.trim();
+  const si=[...document.querySelectorAll("#f-tags-interest input:checked")].map(c=>c.value);
+  const ss=[...document.querySelectorAll("#f-tags-society input:checked")].map(c=>c.value);
+  if(!name){toast("名前を入力してください");return}
+  const idx=parseInt(document.getElementById("f-edit-idx").value);
+  if(idx>=0){
+    members[idx]={name,detail,url,contact,interestTags:si,societyTags:ss};toast("更新しました")
+  } else {
+    if(members.find(m=>m.name===name)){toast("同じ名前のメンバーが既にいます");return}
+    members.push({name,detail,url,contact,interestTags:si,societyTags:ss});toast("追加しました")
+  }
+  closeModal();renderSearch();renderMemberListEdit();
+}
+
+// ===== 管理タブ =====
+function renderTagManage(){
+  document.getElementById("tag-manage-interest").innerHTML=interestTags.map((t,i)=>`<div class="tag-manage-row"><span class="tag-manage-name">${t}</span><button class="icon-btn del" onclick="delTag('interest',${i})">×</button></div>`).join("");
+  document.getElementById("tag-manage-society").innerHTML=societyTags.map((t,i)=>`<div class="tag-manage-row"><span class="tag-manage-name">${t}</span><button class="icon-btn del" onclick="delTag('society',${i})">×</button></div>`).join("");
+}
+function renderMemberListEdit(){
+  const el=document.getElementById("member-list-edit");
+  if(!members.length){el.innerHTML='<div class="empty">まだメンバーがいません。</div>';return}
+  el.innerHTML=members.map((m,i)=>{const c=colorFor(m.name);
+    const meta=[m.url?"🔗":null,m.contact?"📬":null].filter(Boolean).join(" ");
+    const itags=(m.interestTags||[]).map(t=>`<span class="me-tag-i">${t}</span>`).join("");
+    const stags=(m.societyTags||[]).map(t=>`<span class="me-tag-s">${t}</span>`).join("");
+    return`<div class="me-row"><div class="me-avatar" style="background:${c}">${m.name.charAt(0)}</div><div class="me-info"><div class="me-name">${m.name}${meta?` <span class="me-meta">${meta}</span>`:""}</div><div class="me-tags">${itags}${stags}</div></div><div class="me-actions"><button class="icon-btn" onclick="openModal(${i})">✏️</button><button class="icon-btn del" onclick="delMember(${i})">×</button></div></div>`}).join("")
+}
+function renderAdminTab(){
+  renderTagManage();renderMemberListEdit();
+  document.getElementById("current-code-display").textContent=ACCESS_CODE;
+  updateExport();
+}
+function addTag(kind){
+  const id=kind==="interest"?"new-tag-interest":"new-tag-society";
+  const inp=document.getElementById(id),v=inp.value.trim();
+  if(!v)return;
+  const list=kind==="interest"?interestTags:societyTags;
+  if(list.includes(v)){toast("そのタグは既に存在します");return}
+  list.push(v);inp.value="";renderAdminTab();renderSearch();renderRegisterForm();toast("タグを追加しました")
+}
+function delTag(kind,i){
+  const list=kind==="interest"?interestTags:societyTags;
+  const t=list[i];list.splice(i,1);
+  members.forEach(m=>{
+    if(kind==="interest")m.interestTags=(m.interestTags||[]).filter(x=>x!==t);
+    else m.societyTags=(m.societyTags||[]).filter(x=>x!==t);
+  });
+  renderAdminTab();renderSearch();renderRegisterForm();toast(`「${t}」を削除しました`)
+}
+function delMember(i){
+  const name=members[i].name;members.splice(i,1);
+  renderMemberListEdit();renderSearch();toast(`「${name}」を削除しました`)
+}
+function updateExport(){document.getElementById("export-box").value=JSON.stringify({interestTags,societyTags,members},null,2)}
+function copyExport(){
+  const t=document.getElementById("export-box");t.select();
+  try{document.execCommand("copy")}catch{navigator.clipboard.writeText(t.value)}
+  toast("コピーしました")
+}
+function importData(){
+  const raw=prompt("JSONを貼り付けてください：");if(!raw)return;
+  try{
+    const d=JSON.parse(raw);if(!d.members)throw 0;
+    interestTags=d.interestTags||interestTags;
+    societyTags=d.societyTags||societyTags;
+    members=d.members;renderAdminTab();renderSearch();renderRegisterForm();toast("インポートしました")
+  }catch{toast("JSONの形式が正しくありません")}
+}
+function downloadHtml(){
+  const src=document.documentElement.outerHTML;
+  const updated=src
+    .replace(
+      /let ACCESS_CODE\s*=\s*"[^"]*"/,
+      `let ACCESS_CODE = "${ACCESS_CODE}"`
+    )
+    .replace(
+      /let interestTags=\[[\s\S]*?\];[\s\n]*let societyTags=\[[\s\S]*?\];[\s\n]*let members=\[[\s\S]*?\];/,
+      `let interestTags=${JSON.stringify(interestTags)};\nlet societyTags=${JSON.stringify(societyTags)};\nlet members=${JSON.stringify(members)};`
+    );
+  const blob=new Blob([updated],{type:"text/html;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="fujita_matching.html";a.click();URL.revokeObjectURL(a.href);
+  toast("HTMLをダウンロードしました")
+}
+
+// ===== タブ切り替え =====
+function switchTab(id,btn){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));btn.classList.add("active");
+  ["search","register","admin"].forEach(t=>{
+    document.getElementById("tab-"+t).style.display=t===id?"":"none";
+  });
+  document.getElementById("fab").style.display=id==="admin"?"flex":"none";
+  if(id==="admin")renderAdminTab();
+  if(id==="register")renderRegisterForm();
+}
+
+function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2200)}
+
+renderSearch();
+</script>
+</body>
+</html>
