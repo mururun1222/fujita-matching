@@ -1,4 +1,6 @@
-<html lang="ja"><head>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>藤田総診 つながりマッチング</title>
@@ -167,7 +169,7 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 <div id="loading"><div class="spinner"></div><div class="loading-msg" id="loading-msg">読み込み中…</div></div>
 
 <!-- ロック -->
-<div id="lock-screen" style="display: none;">
+<div id="lock-screen">
   <div class="lock-box">
     <div class="lock-icon">🏥</div>
     <div class="lock-title">藤田総診 つながりマッチング</div>
@@ -179,26 +181,26 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 </div>
 
 <!-- メイン -->
-<div id="main" style="display: block;">
+<div id="main">
 <div id="app">
   <div class="tabs">
-    <button class="tab" onclick="switchTab('search',this)">🔍 検索</button>
+    <button class="tab active" onclick="switchTab('search',this)">🔍 検索</button>
     <button class="tab" onclick="switchTab('register',this)">✋ 登録</button>
-    <button class="tab active" onclick="switchTab('admin',this)">⚙️ 管理</button>
+    <button class="tab" onclick="switchTab('admin',this)">⚙️ 管理</button>
   </div>
 
   <!-- 検索 -->
-  <div id="tab-search" style="display: none;">
+  <div id="tab-search">
     <div class="hd">藤田総診 つながりマッチング</div>
     <div class="sub">気になるキーワードをタップ。選んだ分野に近いメンバーが表示されます。</div>
     <div class="tag-group"><div class="tag-group-label">💡 興味・関心</div><div class="tag-grid" id="tags-interest"></div></div>
     <div class="tag-group"><div class="tag-group-label">🏛️ 関わっている学会</div><div class="tag-grid" id="tags-society"></div></div>
     <div class="divider"></div>
-    <div id="results"><div class="empty">タグを選ぶと関連するメンバーが表示されます。</div></div>
+    <div id="results"></div>
   </div>
 
   <!-- 登録 -->
-  <div id="tab-register" style="display: none;">
+  <div id="tab-register" style="display:none">
     <div id="register-form-wrap">
       <div class="register-box">
         <div class="register-title">✋ メンバー登録</div>
@@ -232,16 +234,16 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
   </div>
 
   <!-- 管理 -->
-  <div id="tab-admin" style="">
+  <div id="tab-admin" style="display:none">
 
     <div class="section-title" style="margin-top:0;display:flex;align-items:center">
       ⏳ 承認待ちメンバー
       <button class="reload-btn" onclick="loadAdminData()">🔄 再読み込み</button>
     </div>
-    <div id="pending-list"><div class="empty">承認待ちのメンバーはいません。</div></div>
+    <div id="pending-list"><div class="empty">承認待ちはいません。</div></div>
 
     <div class="section-title">👥 承認済みメンバー</div>
-    <div id="member-list-edit"><div class="empty">承認済みのメンバーはいません。</div></div>
+    <div id="member-list-edit"></div>
 
     <div class="section-title">🏷️ タグ管理</div>
     <div class="tag-section-hd">💡 興味・関心タグ</div>
@@ -269,7 +271,7 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
       <div class="settings-row">
         <input id="s-password" type="text" placeholder="ページパスワード（ACCESS_CODE）">
       </div>
-      <div class="settings-hint" id="settings-hint">✅ 保存しました。「HTMLとして保存」で確定してください。</div>
+      <div class="settings-hint" id="settings-hint"></div>
     </div>
 
     <div class="section-title">💾 HTMLとして保存</div>
@@ -278,7 +280,7 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 </div>
 
 <!-- 管理用モーダル -->
-<button class="fab" id="fab" onclick="openModal()" style="display: flex;">＋</button>
+<button class="fab" id="fab" onclick="openModal()" style="display:none">＋</button>
 <div class="modal-overlay" id="modal-overlay" onclick="overlayClick(event)">
   <div class="modal">
     <div class="modal-header">
@@ -305,13 +307,13 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 </div>
 </div>
 
-<div class="toast show" id="toast">設定を更新しました</div>
+<div class="toast" id="toast"></div>
 
 <script>
 // ===== 設定（ここを書き換えるか、管理タブのAPI設定から入力） =====
-let SCRIPT_URL  = "https://script.google.com/macros/s/AKfycbzpHAmpS0DmlETvk2pOiriVz-3lLan3tPJINLqf41ykZG5y0LAKjcr6YYU9uK-s2Tk04g/exec";
-			let ADMIN_KEY   = "admin_fujita2024";
-			let ACCESS_CODE = "fujita2024"; // ← ページパスワード
+let SCRIPT_URL  = "";           // ← Apps Script Web App URL
+let ADMIN_KEY   = "admin_fujita2024"; // ← Apps Scriptと同じ値
+let ACCESS_CODE = "fujita2024"; // ← ページパスワード
 
 // ===== 状態 =====
 let interestTags=[], societyTags=[], members=[], pendingMembers=[];
@@ -325,6 +327,13 @@ function tryUnlock(){
   if(v===ACCESS_CODE){
     document.getElementById("lock-screen").style.display="none";
     document.getElementById("main").style.display="block";
+    // 必ず検索タブを最初に表示
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    document.querySelectorAll(".tab")[0].classList.add("active");
+    ["search","register","admin"].forEach(t=>{
+      document.getElementById("tab-"+t).style.display=t==="search"?"":"none";
+    });
+    document.getElementById("fab").style.display="none";
     loadData();
   } else {
     document.getElementById("lock-err").textContent="パスワードが正しくありません。";
@@ -592,6 +601,5 @@ function switchTab(id,btn){
 
 function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2500)}
 </script>
-
-
-<deepl-input-controller translate="no"></deepl-input-controller></body></html>
+</body>
+</html>
