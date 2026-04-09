@@ -1,4 +1,6 @@
-<html lang="ja"><head>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>藤田総診 つながりマッチング</title>
@@ -161,13 +163,13 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 .toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:100px;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;z-index:9999;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
-<link rel="stylesheet" href="webkit-masked-url://hidden/"></head>
+</head>
 <body>
 
-<div id="loading" style="display: none;"><div class="spinner"></div><div class="loading-msg" id="loading-msg">処理中…</div></div>
+<div id="loading"><div class="spinner"></div><div class="loading-msg" id="loading-msg">読み込み中…</div></div>
 
 <!-- ロック -->
-<div id="lock-screen" style="display: none;">
+<div id="lock-screen">
   <div class="lock-box">
     <div class="lock-icon">🏥</div>
     <div class="lock-title">藤田総診 つながりマッチング</div>
@@ -179,26 +181,26 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 </div>
 
 <!-- メイン -->
-<div id="main" style="display: block;">
+<div id="main">
 <div id="app">
   <div class="tabs">
-    <button class="tab" onclick="switchTab('search',this)">🔍 検索</button>
+    <button class="tab active" onclick="switchTab('search',this)">🔍 検索</button>
     <button class="tab" onclick="switchTab('register',this)">✋ 登録</button>
-    <button class="tab active" onclick="switchTab('admin',this)">⚙️ 管理</button>
+    <button class="tab" onclick="switchTab('admin',this)">⚙️ 管理</button>
   </div>
 
   <!-- 検索 -->
-  <div id="tab-search" style="display: none;">
+  <div id="tab-search">
     <div class="hd">藤田総診 つながりマッチング</div>
     <div class="sub">気になるキーワードをタップ。選んだ分野に近いメンバーが表示されます。</div>
-    <div class="tag-group"><div class="tag-group-label">💡 興味・関心</div><div class="tag-grid" id="tags-interest"><span class="tag">こころの医療</span><span class="tag">子どもの発達・思春期</span><span class="tag">女性の健康・周産期</span><span class="tag">母子保健</span><span class="tag">離島・へき地医療</span><span class="tag">産業保健・働く人の健康</span><span class="tag">健康経営・予防医療</span><span class="tag">起業・ビジネス</span><span class="tag">テクノロジー × 医療</span><span class="tag">公衆衛生・MPH</span><span class="tag">災害医療・国際保健</span><span class="tag">留学・海外経験</span><span class="tag">アート × 医療</span></div></div>
-    <div class="tag-group"><div class="tag-group-label">🏛️ 関わっている学会</div><div class="tag-grid" id="tags-society"><span class="tag">日本プライマリ・ケア連合学会</span><span class="tag">日本内科学会</span><span class="tag">日本病院総合診療医学会</span><span class="tag">日本老年医学会</span><span class="tag">日本緩和医療学会</span><span class="tag">日本救急医学会</span><span class="tag">日本在宅医学会</span><span class="tag">日本医療情報学会</span><span class="tag">日本心療内科学会/日本心身医学会</span></div></div>
+    <div class="tag-group"><div class="tag-group-label">💡 興味・関心</div><div class="tag-grid" id="tags-interest"></div></div>
+    <div class="tag-group"><div class="tag-group-label">🏛️ 関わっている学会</div><div class="tag-grid" id="tags-society"></div></div>
     <div class="divider"></div>
-    <div id="results"><div class="empty">タグを選ぶと関連するメンバーが表示されます。</div></div>
+    <div id="results"></div>
   </div>
 
   <!-- 登録 -->
-  <div id="tab-register" style="display: none;">
+  <div id="tab-register" style="display:none">
     <div id="register-form-wrap">
       <div class="register-box">
         <div class="register-title">✋ メンバー登録</div>
@@ -232,26 +234,26 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
   </div>
 
   <!-- 管理 -->
-  <div id="tab-admin" style="">
+  <div id="tab-admin" style="display:none">
 
     <div class="section-title" style="margin-top:0;display:flex;align-items:center">
       ⏳ 承認待ちメンバー
       <button class="reload-btn" onclick="loadAdminData()">🔄 再読み込み</button>
     </div>
-    <div id="pending-list"><div class="empty">承認待ちのメンバーはいません。</div></div>
+    <div id="pending-list"><div class="empty">承認待ちはいません。</div></div>
 
     <div class="section-title">👥 承認済みメンバー</div>
-    <div id="member-list-edit"><div class="me-row"><div class="me-avatar" style="background:#993556">中</div><div class="me-info"><div class="me-name">中込</div><div class="me-tags"><span class="me-tag-i">起業・ビジネス</span><span class="me-tag-i">産業保健・働く人の健康</span><span class="me-tag-i">健康経営・予防医療</span><span class="me-tag-i">テクノロジー × 医療</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;中込&quot;,&quot;detail&quot;:&quot;総合診療 × アントレプレナーシップ。産業保健・予防医療・テクノロジーを掛け合わせたキャリアを実践中。&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;起業・ビジネス&quot;,&quot;産業保健・働く人の健康&quot;,&quot;健康経営・予防医療&quot;,&quot;テクノロジー × 医療&quot;],&quot;societyTags&quot;:[],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('中込')">×</button></div></div><div class="me-row"><div class="me-avatar" style="background:#993556">石</div><div class="me-info"><div class="me-name">石川</div><div class="me-tags"><span class="me-tag-i">起業・ビジネス</span><span class="me-tag-i">子どもの発達・思春期</span><span class="me-tag-i">こころの医療</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;石川&quot;,&quot;detail&quot;:&quot;アントレプレナーシップと児童精神を両軸に。発達障害の二次障害に特に関心。&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;起業・ビジネス&quot;,&quot;子どもの発達・思春期&quot;,&quot;こころの医療&quot;],&quot;societyTags&quot;:[],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('石川')">×</button></div></div><div class="me-row"><div class="me-avatar" style="background:#1D9E75">石</div><div class="me-info"><div class="me-name">石原</div><div class="me-tags"><span class="me-tag-i">こころの医療</span><span class="me-tag-i">子どもの発達・思春期</span><span class="me-tag-i">女性の健康・周産期</span><span class="me-tag-i">母子保健</span><span class="me-tag-i">産業保健・働く人の健康</span><span class="me-tag-s">日本プライマリ・ケア連合学会</span><span class="me-tag-s">日本心療内科学会/日本心身医学会</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;石原&quot;,&quot;detail&quot;:&quot;精神科・心療内科領域を軸に、婦人科・母子保健まで幅広くカバー。&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;こころの医療&quot;,&quot;子どもの発達・思春期&quot;,&quot;女性の健康・周産期&quot;,&quot;母子保健&quot;,&quot;産業保健・働く人の健康&quot;],&quot;societyTags&quot;:[&quot;日本プライマリ・ケア連合学会&quot;,&quot;日本心療内科学会/日本心身医学会&quot;],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;Thu Apr 09 2026 14:48:36 GMT+0900 (日本標準時)&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('石原')">×</button></div></div><div class="me-row"><div class="me-avatar" style="background:#BA7517">黒</div><div class="me-info"><div class="me-name">黒田</div><div class="me-tags"><span class="me-tag-i">こころの医療</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;黒田&quot;,&quot;detail&quot;:&quot;心療内科・精神科連携に取り組む。&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;こころの医療&quot;],&quot;societyTags&quot;:[],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('黒田')">×</button></div></div><div class="me-row"><div class="me-avatar" style="background:#0F6E56">森</div><div class="me-info"><div class="me-name">森</div><div class="me-tags"><span class="me-tag-i">こころの医療</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;森&quot;,&quot;detail&quot;:&quot;心療内科・精神科連携に取り組む。&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;こころの医療&quot;],&quot;societyTags&quot;:[],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('森')">×</button></div></div><div class="me-row"><div class="me-avatar" style="background:#639922">山</div><div class="me-info"><div class="me-name">山本</div><div class="me-tags"><span class="me-tag-i">産業保健・働く人の健康</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;山本&quot;,&quot;detail&quot;:&quot;産業保健の実践者。&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;産業保健・働く人の健康&quot;],&quot;societyTags&quot;:[],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('山本')">×</button></div></div><div class="me-row"><div class="me-avatar" style="background:#639922">根</div><div class="me-info"><div class="me-name">根本</div><div class="me-tags"><span class="me-tag-i">離島・へき地医療</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;根本&quot;,&quot;detail&quot;:&quot;離島診療の現場経験を持つ。&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;離島・へき地医療&quot;],&quot;societyTags&quot;:[],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('根本')">×</button></div></div><div class="me-row"><div class="me-avatar" style="background:#185FA5">吉</div><div class="me-info"><div class="me-name">吉澤</div><div class="me-tags"><span class="me-tag-i">離島・へき地医療</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;吉澤&quot;,&quot;detail&quot;:&quot;離島診療の現場経験を持つ。&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;離島・へき地医療&quot;],&quot;societyTags&quot;:[],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('吉澤')">×</button></div></div><div class="me-row"><div class="me-avatar" style="background:#BA7517">青</div><div class="me-info"><div class="me-name">青山幸</div><div class="me-tags"><span class="me-tag-i">母子保健</span><span class="me-tag-i">離島・へき地医療</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;青山幸&quot;,&quot;detail&quot;:&quot;母子保健と離島医療を掛け合わせた実践。&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;母子保健&quot;,&quot;離島・へき地医療&quot;],&quot;societyTags&quot;:[],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('青山幸')">×</button></div></div><div class="me-row"><div class="me-avatar" style="background:#993556">道</div><div class="me-info"><div class="me-name">道川</div><div class="me-tags"><span class="me-tag-i">公衆衛生・MPH</span><span class="me-tag-i">災害医療・国際保健</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;道川&quot;,&quot;detail&quot;:&quot;MPHホルダー。災害医療にも精通。&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;公衆衛生・MPH&quot;,&quot;災害医療・国際保健&quot;],&quot;societyTags&quot;:[],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('道川')">×</button></div></div><div class="me-row"><div class="me-avatar" style="background:#1D9E75">本</div><div class="me-info"><div class="me-name">本多</div><div class="me-tags"><span class="me-tag-i">公衆衛生・MPH</span><span class="me-tag-i">留学・海外経験</span><span class="me-tag-i">アート × 医療</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;本多&quot;,&quot;detail&quot;:&quot;MPH・留学経験あり。アート × 医療という独自の視点を持つ。&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;公衆衛生・MPH&quot;,&quot;留学・海外経験&quot;,&quot;アート × 医療&quot;],&quot;societyTags&quot;:[],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('本多')">×</button></div></div><div class="me-row"><div class="me-avatar" style="background:#D85A30">堀</div><div class="me-info"><div class="me-name">堀彬宏</div><div class="me-tags"><span class="me-tag-i">こころの医療</span><span class="me-tag-s">日本プライマリ・ケア連合学会</span></div></div><div class="me-actions"><button class="icon-btn" onclick="openModal({&quot;name&quot;:&quot;堀彬宏&quot;,&quot;detail&quot;:&quot;&quot;,&quot;url&quot;:&quot;&quot;,&quot;contact&quot;:&quot;&quot;,&quot;interestTags&quot;:[&quot;こころの医療&quot;],&quot;societyTags&quot;:[&quot;日本プライマリ・ケア連合学会&quot;],&quot;status&quot;:&quot;承認&quot;,&quot;timestamp&quot;:&quot;Thu Apr 09 2026 14:39:15 GMT+0900 (日本標準時)&quot;})">✏️</button><button class="icon-btn del" onclick="deleteMember('堀彬宏')">×</button></div></div></div>
+    <div id="member-list-edit"></div>
 
     <div class="section-title">🏷️ タグ管理</div>
     <div class="tag-section-hd">💡 興味・関心タグ</div>
-    <div id="tag-manage-interest"><div class="tag-manage-row"><span class="tag-manage-name">こころの医療</span><button class="icon-btn del" onclick="delTag('interest',0)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">子どもの発達・思春期</span><button class="icon-btn del" onclick="delTag('interest',1)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">女性の健康・周産期</span><button class="icon-btn del" onclick="delTag('interest',2)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">母子保健</span><button class="icon-btn del" onclick="delTag('interest',3)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">離島・へき地医療</span><button class="icon-btn del" onclick="delTag('interest',4)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">産業保健・働く人の健康</span><button class="icon-btn del" onclick="delTag('interest',5)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">健康経営・予防医療</span><button class="icon-btn del" onclick="delTag('interest',6)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">起業・ビジネス</span><button class="icon-btn del" onclick="delTag('interest',7)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">テクノロジー × 医療</span><button class="icon-btn del" onclick="delTag('interest',8)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">公衆衛生・MPH</span><button class="icon-btn del" onclick="delTag('interest',9)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">災害医療・国際保健</span><button class="icon-btn del" onclick="delTag('interest',10)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">留学・海外経験</span><button class="icon-btn del" onclick="delTag('interest',11)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">アート × 医療</span><button class="icon-btn del" onclick="delTag('interest',12)">×</button></div></div>
+    <div id="tag-manage-interest"></div>
     <div class="tag-add-row">
       <input id="new-tag-interest" type="text" placeholder="興味・関心タグを追加…">
       <button class="bi" onclick="addTag('interest')">追加</button>
     </div>
     <div class="tag-section-hd">🏛️ 学会タグ</div>
-    <div id="tag-manage-society"><div class="tag-manage-row"><span class="tag-manage-name">日本プライマリ・ケア連合学会</span><button class="icon-btn del" onclick="delTag('society',0)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">日本内科学会</span><button class="icon-btn del" onclick="delTag('society',1)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">日本病院総合診療医学会</span><button class="icon-btn del" onclick="delTag('society',2)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">日本老年医学会</span><button class="icon-btn del" onclick="delTag('society',3)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">日本緩和医療学会</span><button class="icon-btn del" onclick="delTag('society',4)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">日本救急医学会</span><button class="icon-btn del" onclick="delTag('society',5)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">日本在宅医学会</span><button class="icon-btn del" onclick="delTag('society',6)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">日本医療情報学会</span><button class="icon-btn del" onclick="delTag('society',7)">×</button></div><div class="tag-manage-row"><span class="tag-manage-name">日本心療内科学会/日本心身医学会</span><button class="icon-btn del" onclick="delTag('society',8)">×</button></div></div>
+    <div id="tag-manage-society"></div>
     <div class="tag-add-row">
       <input id="new-tag-society" type="text" placeholder="学会名を追加…">
       <button class="bs" onclick="addTag('society')">追加</button>
@@ -269,7 +271,7 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
       <div class="settings-row">
         <input id="s-password" type="text" placeholder="ページパスワード（ACCESS_CODE）">
       </div>
-      <div class="settings-hint" id="settings-hint">✅ 保存しました。「HTMLとして保存」で確定してください。</div>
+      <div class="settings-hint" id="settings-hint"></div>
     </div>
 
     <div class="section-title">💾 HTMLとして保存</div>
@@ -278,7 +280,7 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 </div>
 
 <!-- 管理用モーダル -->
-<button class="fab" id="fab" onclick="openModal()" style="display: flex;">＋</button>
+<button class="fab" id="fab" onclick="openModal()" style="display:none">＋</button>
 <div class="modal-overlay" id="modal-overlay" onclick="overlayClick(event)">
   <div class="modal">
     <div class="modal-header">
@@ -305,13 +307,13 @@ body{background:var(--bg1);color:var(--t1);font-family:-apple-system,BlinkMacSys
 </div>
 </div>
 
-<div class="toast" id="toast">HTMLをダウンロードしました</div>
+<div class="toast" id="toast"></div>
 
 <script>
 // ===== 設定（ここを書き換えるか、管理タブのAPI設定から入力） =====
 let SCRIPT_URL  = "https://script.google.com/macros/s/AKfycbzpHAmpS0DmlETvk2pOiriVz-3lLan3tPJINLqf41ykZG5y0LAKjcr6YYU9uK-s2Tk04g/exec";
-			let ADMIN_KEY   = "admin_fujita2024";
-			let ACCESS_CODE = "fujita2024"; // ← ページパスワード
+let ADMIN_KEY   = "admin_fujita2024"; // ← Apps Scriptと同じ値
+let ACCESS_CODE = "fujita2024"; // ← ページパスワード
 
 // ===== 状態 =====
 let interestTags=[], societyTags=[], members=[], pendingMembers=[];
@@ -599,6 +601,5 @@ function switchTab(id,btn){
 
 function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2500)}
 </script>
-
-
-<div id="__wtdl-global-data" style="display: none;"></div><toast-progress id="toast-progress"></toast-progress><toast-error id="toast-error"></toast-error></body></html>
+</body>
+</html>
